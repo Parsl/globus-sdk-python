@@ -37,7 +37,10 @@ class GlobusAPIError(GlobusError):
 
     def __init__(self, r, *args, **kw):
         self._underlying_response = r
-        self.http_status = r.status_code
+        if hasattr(r, 'status_code'):
+            self.http_status = r.status_code
+        else:
+            raise RuntimeError("BENC: expected an http status code, but underlying response did not have one: {}".format(r))
         if "Content-Type" in r.headers and (
             "application/json" in r.headers["Content-Type"]
         ):
